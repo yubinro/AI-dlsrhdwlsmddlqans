@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="명지대학교 자연캠퍼스 졸업학점 자가진단과 다음 학기 수강 시뮬레이션">
+  <title>명지대학교 졸업학점 계산기</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+<header class="top"><div class="wrap top-inner">
+  <div class="brand"><span class="brand-mark" aria-hidden="true">M</span><div><strong>명지대학교</strong><span>졸업학점 계산기</span></div></div>
+  <span class="campus"><i></i> 자연캠퍼스</span>
+</div></header>
+<main class="wrap">
+  <nav class="steps" aria-label="진단 단계">
+    <button type="button" data-view="settings"><span>1</span>학번·학과 설정</button>
+    <button type="button" data-view="courses"><span>2</span>기이수 과목 입력</button>
+    <button type="button" data-view="dashboard"><span>3</span>졸업 요건 진단</button>
+  </nav>
+  <section id="dashboard" class="view" aria-labelledby="dashboard-title">
+    <div class="page-head"><div><div class="eyebrow">GRADUATION AUDIT</div><h1 id="dashboard-title" tabindex="-1">졸업 요건 진단</h1><p>영역별 이수 현황과 다음 학기 수강 계획을 한눈에 확인하세요.</p></div><button type="button" class="button" data-view="courses"><span aria-hidden="true">＋</span> 과목 수정하기</button></div>
+    <div class="criteria-bar"><div><span class="flag" id="profile-kind"></span><strong id="active-profile"></strong></div><button id="own-profile" type="button" class="text-button"></button></div>
+    <div class="dashboard-grid">
+      <aside class="summary" aria-label="총학점 현황">
+        <div class="summary-head"><h2>총학점 현황</h2><span id="summary-mode"></span></div>
+        <div class="ring" id="ring" role="img"><div class="ring-inner"><strong id="total-percent"></strong><span>총학점 달성률</span></div></div>
+        <div class="summary-stats">
+          <div><span id="earned-label">취득 학점</span><strong id="sum-earned"></strong></div>
+          <div><span>졸업 기준</span><strong id="sum-goal"></strong></div>
+          <div><span>남은 총학점</span><strong id="sum-left"></strong></div>
+        </div>
+        <div class="summary-foot"><span aria-hidden="true">◇</span><span id="overall"></span></div>
+      </aside>
+      <section class="card requirements" aria-labelledby="requirements-title">
+        <div class="card-head"><div><h2 id="requirements-title">영역별 이수 현황</h2><p>이수구분별 취득 학점과 부족 학점</p></div></div>
+        <div class="tabs" aria-label="영역 필터">
+          <button type="button" data-filter="all">전체</button><button type="button" data-filter="major">전공</button><button type="button" data-filter="liberal">교양</button><button type="button" data-filter="warnings">선이수 경고 <span id="warning-count"></span></button>
+        </div>
+        <div id="requirements-list"></div>
+      </section>
+    </div>
+    <div class="dashboard-grid secondary-grid">
+      <section class="card padded" aria-labelledby="alerts-title">
+        <div class="card-head"><div><h2 id="alerts-title">우선 수강 추천</h2><p>미이수 필수과목과 선이수 제한을 확인하세요.</p></div></div>
+        <div id="alerts"></div>
+      </section>
+      <section class="card padded" aria-labelledby="plan-title">
+        <div class="card-head"><div><h2 id="plan-title">다음 학기 시뮬레이션</h2><p id="plan-total"></p></div><button class="text-button" type="button" id="reset-plan">시뮬레이션 초기화</button></div>
+        <div class="limit" id="limit-note" role="alert" hidden></div>
+        <form class="course-form" id="plan-form" novalidate></form>
+        <div id="plan-list"></div>
+      </section>
+    </div>
+  </section>
+  <section id="settings" class="view" hidden aria-labelledby="settings-title">
+    <div class="page-head"><div><div class="eyebrow">GRADUATION AUDIT</div><h1 id="settings-title" tabindex="-1">학번·학과 설정</h1><p>소속 정보와 본인에게 적용되는 졸업 기준을 설정하세요.</p></div><button class="button" id="load-example" type="button">22학번 컴공 예시 적용</button></div>
+    <form id="profile-form" class="card padded settings-form" novalidate>
+      <h2>소속 정보</h2>
+      <div class="field-grid">
+        <label>입학년도<select id="year"><option value="">학번 선택</option></select></label>
+        <label>단과대학<select id="college"><option value="">단과대학 선택</option></select></label>
+        <label>학과<select id="department"><option value="">학과 선택</option></select></label>
+        <label id="custom-row" hidden>학과명 직접 입력<input id="custom-department" maxlength="20" placeholder="소속 학과명"></label>
+      </div>
+      <div class="notice" id="profile-notice"></div>
+      <div class="section-divider"></div>
+      <h2>영역별 기준 학점</h2><p class="subtext">학교에서 확인한 본인의 기준을 입력하세요. 해당 영역이 없으면 0을 입력하세요.</p>
+      <div class="field-grid targets" id="targets"></div>
+      <div class="section-divider"></div>
+      <h2>필수·선이수 과목</h2><p class="subtext">학교에서 확인한 필수과목과, 그 과목을 먼저 이수해야 수강할 수 있는 과목을 등록하세요.</p>
+      <div id="rule-fields"></div>
+      <button type="button" class="button small" id="add-rule">＋ 필수과목 등록</button>
+      <p id="profile-error" class="error" role="alert" hidden></p>
+      <div class="actions"><button type="submit" class="button primary">과목 입력하러 가기</button></div>
+    </form>
+  </section>
+  <section id="courses" class="view" hidden aria-labelledby="courses-title">
+    <div class="page-head"><div><div class="eyebrow">GRADUATION AUDIT</div><h1 id="courses-title" tabindex="-1">기이수 과목 입력</h1><p>성적표를 보면서 이수한 과목과 학점을 추가하세요.</p></div><button type="button" class="button" data-view="settings">졸업 기준 설정</button></div>
+    <section class="card padded" aria-labelledby="ledger-title">
+      <div class="card-head"><div><h2 id="ledger-title">이수 과목</h2><p id="courses-context"></p></div><strong class="ledger-total" id="course-total"></strong></div>
+      <form class="course-form" id="course-form" novalidate></form>
+      <div id="course-list"></div>
+      <p id="diagnose-error" class="error" role="alert" hidden></p>
+      <div class="actions"><button type="button" class="button primary" id="diagnose">졸업 요건 진단하기</button></div>
+    </section>
+  </section>
+  <footer><span>명지대학교 자연캠퍼스 · 졸업학점 자가진단</span><span>최종 졸업사정은 소속 학과에서 확인하세요. <a href="https://sba.mju.ac.kr/mjukr/808/subview.do" target="_blank" rel="noopener">학교 교육과정 안내</a></span></footer>
+</main>
+<div id="toast" role="status" hidden></div>
+</body>
+</html>
